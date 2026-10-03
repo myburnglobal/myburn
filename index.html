@@ -1,356 +1,178 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>myburn.global // daily curated music discovery</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>myburn // Playlist of the Day</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-color: #0b0c10;
-      --card-bg: #1f2833;
-      --accent-orange: #ff5e00;
-      --accent-cyan: #66fcf1;
-      --text-main: #c5c6c7;
-      --text-bright: #ffffff;
-      --border-color: #45a29e;
+      --bg-color: #0b0b0f;
+      --panel-color: #12121a;
+      --accent-purple: #9d4edd;
+      --accent-cyan: #00f5d4;
+      --text-main: #f8f9fa;
+      --text-muted: #8e92a6;
     }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background-color: var(--bg-color);
       color: var(--text-main);
-      font-family: 'Space Mono', monospace;
+      font-family: 'Space Grotesk', sans-serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      padding: 20px;
+      position: relative;
     }
-
-    header {
-      width: 100%;
-      max-width: 1000px;
-      text-align: center;
-      margin-bottom: 30px;
-      border-bottom: 2px dashed var(--accent-orange);
-      padding-bottom: 15px;
+    body::before {
+      content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      z-index: 9999; background-size: 100% 4px, 6px 100%; pointer-events: none;
     }
-
+    header { padding: 2rem; text-align: center; border-bottom: 1px solid #1f1f2e; }
     .logo {
-      font-family: 'VT323', monospace;
-      font-size: 3.5rem;
-      color: var(--accent-orange);
-      text-shadow: 0 0 10px rgba(255, 94, 0, 0.5);
-      letter-spacing: 2px;
+      font-family: 'Space Mono', monospace; font-size: 2.5rem; font-weight: 700;
+      color: var(--text-main); text-shadow: 0 0 10px rgba(157, 78, 221, 0.5);
     }
+    .logo span { color: var(--accent-purple); }
+    .tagline { font-family: 'Space Mono', monospace; color: var(--accent-cyan); font-size: 0.9rem; margin-top: 0.5rem; letter-spacing: 2px; }
+    main { flex: 1; display: grid; grid-template-columns: 1fr; max-width: 1200px; width: 100%; margin: 0 auto; padding: 2rem; gap: 2rem; }
+    @media (min-width: 992px) { main { grid-template-columns: 1.3fr 0.7fr; } }
+    .player-section { display: flex; flex-direction: column; gap: 1.5rem; }
+    .player-panel { background: var(--panel-color); border: 1px solid #2a2a3a; padding: 1.5rem; border-radius: 8px; display: flex; flex-direction: column; gap: 1rem; }
+    .status-bar { display: flex; justify-content: space-between; align-items: center; font-family: 'Space Mono', monospace; font-size: 0.8rem; border-bottom: 1px solid #2a2a3a; padding-bottom: 0.75rem; }
+    .live-dot { width: 8px; height: 8px; background-color: #ff0055; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #ff0055; animation: blink 1.5s infinite; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .meta-display { margin-top: 0.5rem; }
+    .curator-header { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .curator-header span { color: var(--accent-cyan); }
+    .vibe-text { font-family: 'Space Mono', monospace; font-style: italic; color: var(--text-muted); font-size: 0.95rem; line-height: 1.4; margin-top: 0.5rem; }
+    
+    /* 7-Day Timeline Layout Matrix Elements Styles */
+    .timeline-container { background: var(--panel-color); border: 1px solid #2a2a3a; padding: 1.5rem; border-radius: 8px; display: flex; flex-direction: column; gap: 1rem; }
+    .timeline-title { font-family: 'Space Mono', monospace; font-size: 0.9rem; color: var(--accent-purple); letter-spacing: 1px; text-transform: uppercase; }
+    .timeline-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+    @media (min-width: 576px) { .timeline-grid { grid-template-columns: repeat(7, 1fr); } }
+    .timeline-card { background: #171722; border: 1px solid #2d2d3f; padding: 0.75rem; border-radius: 4px; display: flex; flex-direction: column; gap: 0.4rem; text-decoration: none; color: inherit; transition: transform 0.2s, border-color 0.2s; cursor: pointer; }
+    .timeline-card:hover { transform: translateY(-2px); border-color: var(--accent-cyan); }
+    .timeline-card.past { opacity: 0.65; border-color: #1f1f2e; }
+    .timeline-card.today { border-color: var(--accent-cyan); box-shadow: 0 0 10px rgba(0, 245, 212, 0.2); background: #121e1f; }
+    .timeline-card.future { border-color: rgba(157, 78, 221, 0.3); opacity: 0.7; }
+    .timeline-card.selected { border-color: var(--accent-purple) !important; box-shadow: 0 0 12px rgba(157, 78, 221, 0.4) !important; }
+    .card-date { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--text-muted); }
+    .timeline-card.today .card-date { color: var(--accent-cyan); font-weight: bold; }
+    .card-name { font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-loc { font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .tagline {
-      font-size: 0.9rem;
-      color: var(--accent-cyan);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    main {
-      width: 100%;
-      max-width: 1000px;
-      display: flex;
-      flex-direction: column;
-      gap: 30px;
-    }
-
-    /* Featured Today Section */
-    .featured-section {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 24px;
-      box-shadow: 0 0 15px rgba(102, 252, 241, 0.1);
-    }
-
-    .featured-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-
-    .badge-today {
-      background-color: var(--accent-orange);
-      color: #000;
-      font-weight: bold;
-      padding: 4px 10px;
-      font-size: 0.8rem;
-      border-radius: 4px;
-      text-transform: uppercase;
-    }
-
-    .curator-meta {
-      font-size: 1.1rem;
-      color: var(--text-bright);
-    }
-
-    .curator-location {
-      color: var(--accent-cyan);
-      font-size: 0.9rem;
-    }
-
-    .write-up {
-      margin: 15px 0 20px 0;
-      line-height: 1.6;
-      font-size: 0.95rem;
-      color: var(--text-main);
-      background-color: rgba(0, 0, 0, 0.3);
-      padding: 15px;
-      border-left: 3px solid var(--accent-orange);
-    }
-
-    .player-container {
-      width: 100%;
-      border-radius: 12px;
-      overflow: hidden;
-      margin-top: 15px;
-    }
-
-    iframe {
-      border: none;
-      width: 100%;
-      height: 352px;
-    }
-
-    /* 7-Day Rolling Timeline Grid */
-    .timeline-title {
-      font-family: 'VT323', monospace;
-      font-size: 2rem;
-      color: var(--text-bright);
-      margin-bottom: 15px;
-    }
-
-    .grid-timeline {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-      gap: 12px;
-    }
-
-    .card-day {
-      background: rgba(31, 40, 51, 0.6);
-      border: 1px solid #2c3540;
-      border-radius: 6px;
-      padding: 12px;
-      text-align: center;
-      transition: all 0.2s ease-in-out;
-      cursor: pointer;
-    }
-
-    .card-day:hover {
-      border-color: var(--accent-cyan);
-      transform: translateY(-2px);
-    }
-
-    .card-day.active {
-      border-color: var(--accent-orange);
-      background-color: var(--card-bg);
-      box-shadow: 0 0 8px rgba(255, 94, 0, 0.3);
-    }
-
-    .card-date {
-      font-size: 0.75rem;
-      color: var(--accent-cyan);
-      margin-bottom: 6px;
-    }
-
-    .card-curator {
-      font-size: 0.85rem;
-      color: var(--text-bright);
-      font-weight: bold;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .card-location {
-      font-size: 0.7rem;
-      color: var(--text-main);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .status-msg {
-      text-align: center;
-      padding: 40px;
-      color: var(--accent-cyan);
-      font-size: 1.2rem;
-    }
-
-    footer {
-      margin-top: 50px;
-      font-size: 0.8rem;
-      color: #666;
-      text-align: center;
-    }
-
-    @media (max-width: 600px) {
-      .grid-timeline {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
+    .form-section { background: var(--panel-color); border: 1px solid #2a2a3a; padding: 1.5rem; border-radius: 8px; display: flex; flex-direction: column; gap: 1.2rem; align-self: start; }
+    .form-section h2 { font-size: 1.3rem; border-bottom: 1px solid #2a2a3a; padding-bottom: 0.5rem; font-family: 'Space Mono', monospace; color: var(--accent-purple); }
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+    .form-group label { font-family: 'Space Mono', monospace; font-size: 0.8rem; color: var(--text-muted); }
+    .form-group input, .form-group textarea { background: #1a1a26; border: 1px solid #3a3a52; padding: 0.75rem; border-radius: 4px; color: #fff; font-family: inherit; font-size: 0.95rem; }
+    .submit-btn { background: linear-gradient(45deg, var(--accent-purple), #7b2cbf); color: white; border: none; padding: 0.8rem; font-family: 'Space Mono', monospace; font-weight: 700; border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+    footer { text-align: center; padding: 2rem; color: var(--text-muted); font-family: 'Space Mono', monospace; font-size: 0.8rem; border-top: 1px solid #1f1f2e; }
   </style>
 </head>
 <body>
 
   <header>
-    <div class="logo">MYBURN.GLOBAL</div>
-    <div class="tagline">// 1 CURATED PLAYLIST. EVERY SINGLE DAY.</div>
+    <div class="logo">my<span>burn</span></div>
+    <div class="tagline">// ONE GLOBAL MIXTAPE EVERY 24 HOURS</div>
   </header>
 
-  <main id="app">
-    <div class="status-msg">INITIALIZING Y2K AUDIO MATRIX...</div>
+  <main>
+    <!-- Left Hand Side Display Frame Section -->
+    <div class="player-section">
+      
+      <!-- Primary Operational Live Music Core Player Display Deck Box -->
+      <section class="player-panel">
+        <div class="status-bar">
+          <div><span class="live-dot"></span> ON AIR</div>
+          <div id="display-date">LOADING CONSOLE DATA...</div>
+        </div>
+        
+        <div id="player-container">
+          <div style="height: 352px; background: #1a1a26; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: var(--text-muted); font-family: monospace;">
+            CONNECTING TO DECK SLOTS...
+          </div>
+        </div>
+
+        <div class="meta-display">
+          <div class="curator-header">Today's Selection by <span id="curator-name">------</span></div>
+          <div id="playlist-vibe" class="vibe-text">"Syncing streaming grid array tracking nodes..."</div>
+        </div>
+      </section>
+
+      <!-- The Automated Continuous 7-Day Timeline Matrix Layout Grid Segment -->
+      <section class="timeline-container">
+        <div class="timeline-title">// ROTATION LINEUP (3 DAYS PAST // 3 DAYS FUTURE)</div>
+        <div id="timeline-grid" class="timeline-grid">
+          <!-- Generation placeholders mapped natively inside the structural JS module execution below -->
+        </div>
+      </section>
+
+    </div>
+
+    <!-- Right Hand Side: Content Submissions Pipeline Entry Form Section -->
+    <section class="form-section">
+      <h2>BURN FOR THE WORLD</h2>
+      <form id="submission-form" onsubmit="handleFormSubmit(event)">
+        <div class="form-group">
+          <label for="name">Handle / Name</label>
+          <input type="text" id="name" name="name" required placeholder="e.g., retro_driver99">
+        </div>
+        <div class="form-group">
+          <label for="location">Your Location</label>
+          <input type="text" id="location" name="location" required placeholder="e.g., Tokyo, Japan">
+        </div>
+        <div class="form-group">
+          <label for="link">Public Spotify Playlist Link</label>
+          <input type="url" id="link" name="link" required placeholder="https://open.spotify.com/playlist/...">
+        </div>
+        <div class="form-group">
+          <label for="vibe">The Vibe (One sentence context)</label>
+          <textarea id="vibe" name="vibe" rows="3" required placeholder="Late night rain highway racing electronics..."></textarea>
+        </div>
+        <button type="submit" id="submit-btn" class="submit-btn">Inject Music</button>
+      </form>
+    </section>
   </main>
 
   <footer>
-    &copy; MYBURN.GLOBAL &mdash; ALL RIGHTS RESERVED
+    <p>&copy; 2026 myburn.audio // structural automated grid execution system</p>
   </footer>
 
   <script>
-    // =========================================================================
-    // PASTE YOUR DEPLOYED GOOGLE APPS SCRIPT WEB APP URL HERE:
-    // =========================================================================
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-x3kh2Q799rby1kkam7Sg1yo1zx6VMOrkRM45f5IidQaHN_pOu471l6lAlnMxenSC/exec";
+    // Paste your deployed Apps Script URL here:
+    const GOOGLE_APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-x3kh2Q799rby1kkam7Sg1yo1zx6VMOrkRM45f5IidQaHN_pOu471l6lAlnMxenSC/exec";
 
-    async function initApp() {
-      const appContainer = document.getElementById("app");
+    let globalSchedule = [];
+    let todayStr = "";
 
-      try {
-        const response = await fetch(APPS_SCRIPT_URL);
-        const data = await response.json();
+    function formatDateISO(dateObj) {
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
 
-        if (!data || data.length === 0) {
-          appContainer.innerHTML = '<div class="status-msg">NO CURATIONS SCHEDULED.</div>';
-          return;
-        }
-
-        // Get dates normalized to YYYY-MM-DD
-        const todayStr = new Date().toISOString().split('T')[0];
-
-        // Parse and sort rows by scheduled date
-        const processedRows = data.map(row => {
-          let dateStr = "";
-          if (row["scheduled date"]) {
-            const parsedDate = new Date(row["scheduled date"]);
-            if (!isNaN(parsedDate)) {
-              dateStr = parsedDate.toISOString().split('T')[0];
-            }
-          }
-          return {
-            name: row["name"] || "Anonymous",
-            location: row["location"] || "Global",
-            link: row["playlist link"] || "",
-            writeup: row["write-up"] || "",
-            date: dateStr
-          };
-        }).filter(r => r.date !== "");
-
-        // Find today's entry (or default to latest available)
-        let activeEntry = processedRows.find(r => r.date === todayStr) || processedRows[0];
-
-        renderPlatform(appContainer, processedRows, activeEntry, todayStr);
-
-      } catch (err) {
-        console.error(err);
-        appContainer.innerHTML = '<div class="status-msg">ERROR CONNECTING TO MYBURN ENGINE.</div>';
+    function cleanGoogleDateString(rawDateStr) {
+      if (!rawDateStr) return "";
+      const cleanStr = rawDateStr.toString().trim();
+      if (cleanStr.match(/^\d{4}-\d{2}-\d{2}$/)) return cleanStr;
+      if (cleanStr.includes('T')) return cleanStr.split('T')[0];
+      const parsedTimestamp = Date.parse(cleanStr);
+      if (!isNaN(parsedTimestamp)) {
+        const parsedDate = new Date(parsedTimestamp);
+        return formatDateISO(parsedDate);
       }
+      return cleanStr;
     }
 
-    function renderPlatform(container, allEntries, selectedEntry, todayStr) {
-      const spotifyEmbedUrl = convertToEmbedUrl(selectedEntry.link);
-
-      // Build 7-day lineage (3 past, today, 3 future)
-      const timelineEntries = build7DayLineage(allEntries, todayStr);
-
-      container.innerHTML = `
-        <section class="featured-section">
-          <div class="featured-header">
-            <div>
-              <span class="curator-meta">${escapeHtml(selectedEntry.name)}</span>
-              <span class="curator-location">&bull; ${escapeHtml(selectedEntry.location)}</span>
-            </div>
-            ${selectedEntry.date === todayStr ? '<span class="badge-today">TODAY\'S BURN</span>' : `<span class="badge-today" style="background:#45a29e; color:#000;">${selectedEntry.date}</span>`}
-          </div>
-
-          <div class="write-up">
-            "${escapeHtml(selectedEntry.writeup)}"
-          </div>
-
-          <div class="player-container">
-            ${spotifyEmbedUrl 
-              ? `<iframe src="${spotifyEmbedUrl}" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`
-              : `<div style="padding: 20px; text-align: center; color: var(--accent-orange);">[INVALID OR MISSING PLAYLIST LINK]</div>`
-            }
-          </div>
-        </section>
-
-        <section>
-          <div class="timeline-title">// 7-DAY LINEAGE</div>
-          <div class="grid-timeline">
-            ${timelineEntries.map(entry => `
-              <div class="card-day ${entry.date === selectedEntry.date ? 'active' : ''}" onclick="selectCard('${entry.date}')">
-                <div class="card-date">${formatCardDate(entry.date, todayStr)}</div>
-                <div class="card-curator">${escapeHtml(entry.name)}</div>
-                <div class="card-location">${escapeHtml(entry.location)}</div>
-              </div>
-            `).join('')}
-          </div>
-        </section>
-      `;
-
-      // Store in global window for easy card switching
-      window.allEntries = allEntries;
-      window.todayStr = todayStr;
-    }
-
-    function selectCard(targetDate) {
-      const selected = window.allEntries.find(r => r.date === targetDate);
-      if (selected) {
-        renderPlatform(document.getElementById("app"), window.allEntries, selected, window.todayStr);
-      }
-    }
-
-    function build7DayLineage(entries, todayStr) {
-      const todayDate = new Date(todayStr);
-      const lineageDates = [];
-
-      for (let i = -3; i <= 3; i++) {
-        const d = new Date(todayDate);
-        d.setDate(d.getDate() + i);
-        lineageDates.push(d.toISOString().split('T')[0]);
-      }
-
-      return lineageDates.map(dStr => {
-        const found = entries.find(e => e.date === dStr);
-        if (found) return found;
-        return {
-          date: dStr,
-          name: "UNANNOUNCED",
-          location: "---",
-          link: "",
-          writeup: "Curator pending drop."
-        };
-      });
-    }
-
-    function convertToEmbedUrl(url) {
+    function getSpotifyEmbedUrl(url) {
       if (!url) return null;
-      // Convert standard Spotify link to embed iframe link
       if (url.includes("open.spotify.com/playlist/")) {
         const parts = url.split("playlist/");
         const playlistId = parts[1].split("?")[0];
@@ -359,18 +181,146 @@
       return url;
     }
 
-    function formatCardDate(dateStr, todayStr) {
-      if (dateStr === todayStr) return "TODAY";
-      const parts = dateStr.split('-');
-      return `${parts[1]}/${parts[2]}`;
+    function generateTargetTimelineArray() {
+      const targetDates = [];
+      const today = new Date();
+      for (let i = -3; i <= 3; i++) {
+        const baseDate = new Date(today);
+        baseDate.setDate(baseDate.getDate() + i);
+        targetDates.push(formatDateISO(baseDate));
+      }
+      return targetDates;
+    }
+
+    async function initializeSystem() {
+      todayStr = formatDateISO(new Date());
+
+      try {
+        const response = await fetch(`${GOOGLE_APP_SCRIPT_URL}?t=${Date.now()}`);
+        if (!response.ok) throw new Error("Connection failed");
+        
+        const rawData = await response.json();
+        
+        // Normalize object keys from Google Sheets JSON response
+        globalSchedule = rawData.map(row => {
+          const keys = Object.keys(row);
+          const getVal = (target) => {
+            const k = keys.find(key => key.trim().toLowerCase() === target.toLowerCase());
+            return k ? row[k] : "";
+          };
+
+          return {
+            name: getVal("name") || "Anonymous",
+            location: getVal("location") || "Global",
+            link: getVal("playlist link") || "",
+            writeup: getVal("write-up") || getVal("writeup") || "",
+            date: cleanGoogleDateString(getVal("scheduled date"))
+          };
+        }).filter(r => r.date !== "");
+
+        // Find today's entry or fallback to closest row
+        const activeItem = globalSchedule.find(item => item.date === todayStr) || globalSchedule[0] || {
+          name: "UNANNOUNCED",
+          location: "SYSTEM",
+          link: "",
+          writeup: "No active mixtape in rotation for today.",
+          date: todayStr
+        };
+
+        renderActivePlayer(activeItem);
+        renderTimelineGrid(activeItem.date);
+
+      } catch (err) {
+        console.error("Matrix connection error:", err);
+        document.getElementById("player-container").innerHTML = `
+          <div style="height: 352px; background: #1a1a26; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 8px; color: var(--accent-purple); font-family: monospace; padding: 20px; text-align: center;">
+            <div style="font-weight: bold; margin-bottom: 8px;">[DECK CONNECTION ERROR]</div>
+            Please verify your Google Apps Script Web App URL inside index.html
+          </div>`;
+      }
+    }
+
+    function renderActivePlayer(item) {
+      document.getElementById("display-date").textContent = item.date;
+      document.getElementById("curator-name").innerHTML = `${escapeHtml(item.name)} <span style="font-size: 0.9rem; font-weight: normal; color: var(--text-muted);">&bull; ${escapeHtml(item.location)}</span>`;
+      document.getElementById("playlist-vibe").textContent = `"${escapeHtml(item.writeup)}"`;
+
+      const embedUrl = getSpotifyEmbedUrl(item.link);
+      const container = document.getElementById("player-container");
+
+      if (embedUrl) {
+        container.innerHTML = `<iframe src="${embedUrl}" width="100%" height="352" frameborder="0" allowtransparency="true" allow="encrypted-media" style="border-radius: 8px;" loading="lazy"></iframe>`;
+      } else {
+        container.innerHTML = `
+          <div style="height: 352px; background: #1a1a26; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: var(--text-muted); font-family: monospace;">
+            [SPOTIFY LINK INVALID OR UNSET]
+          </div>`;
+      }
+    }
+
+    function renderTimelineGrid(selectedDateStr) {
+      const timelineDates = generateTargetTimelineArray();
+      const gridContainer = document.getElementById("timeline-grid");
+
+      gridContainer.innerHTML = timelineDates.map(dStr => {
+        const entry = globalSchedule.find(r => r.date === dStr) || {
+          date: dStr,
+          name: "UNANNOUNCED",
+          location: "---"
+        };
+
+        let cardClass = "timeline-card";
+        if (dStr === todayStr) cardClass += " today";
+        else if (dStr < todayStr) cardClass += " past";
+        else cardClass += " future";
+
+        if (dStr === selectedDateStr) cardClass += " selected";
+
+        const labelDate = dStr === todayStr ? "TODAY" : dStr.slice(5);
+
+        return `
+          <div class="${cardClass}" onclick="selectTimelineCard('${dStr}')">
+            <div class="card-date">${labelDate}</div>
+            <div class="card-name">${escapeHtml(entry.name)}</div>
+            <div class="card-loc">${escapeHtml(entry.location)}</div>
+          </div>`;
+      }).join('');
+    }
+
+    function selectTimelineCard(dStr) {
+      const selected = globalSchedule.find(r => r.date === dStr) || {
+        date: dStr,
+        name: "UNANNOUNCED",
+        location: "SYSTEM",
+        link: "",
+        writeup: "Slot unassigned in grid schedule."
+      };
+
+      renderActivePlayer(selected);
+      renderTimelineGrid(dStr);
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById("submit-btn");
+      btn.textContent = "INJECTED TO BUFFER!";
+      btn.style.background = "var(--accent-cyan)";
+      btn.style.color = "#000";
+
+      setTimeout(() => {
+        document.getElementById("submission-form").reset();
+        btn.textContent = "Inject Music";
+        btn.style.background = "linear-gradient(45deg, var(--accent-purple), #7b2cbf)";
+        btn.style.color = "#fff";
+      }, 2000);
     }
 
     function escapeHtml(str) {
       return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
 
-    // Launch application
-    initApp();
+    // Initialize layout execution on window load
+    window.addEventListener('DOMContentLoaded', initializeSystem);
   </script>
 </body>
 </html>
