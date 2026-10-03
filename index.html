@@ -3,419 +3,385 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>myburn.global</title>
+  <title>myburn // Playlist of the Day</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-color: #0d0d0d;
-      --card-bg: #1a1a1a;
-      --accent-color: #ff4500;
-      --text-color: #f0f0f0;
-      --muted-text: #888888;
-      --border-color: #333333;
+      --bg-color: #0b0b0f;
+      --panel-color: #12121a;
+      --accent-purple: #9d4edd;
+      --accent-cyan: #00f5d4;
+      --text-main: #f8f9fa;
+      --text-muted: #8e92a6;
     }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background-color: var(--bg-color);
-      color: var(--text-color);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
+      color: var(--text-main);
+      font-family: 'Space Grotesk', sans-serif;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
-      align-items: center;
-    }
-
-    header {
-      width: 100%;
-      max-width: 800px;
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      letter-spacing: -1px;
-      margin-bottom: 5px;
-    }
-
-    .sub-heading {
-      color: var(--muted-text);
-      font-size: 0.95rem;
-    }
-
-    main {
-      width: 100%;
-      max-width: 800px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .card {
-      background-color: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      padding: 20px;
-    }
-
-    .date-selector {
-      display: flex;
-      gap: 10px;
-      overflow-x: auto;
-      padding-bottom: 10px;
-      margin-bottom: 15px;
-    }
-
-    .date-btn {
-      background: none;
-      border: 1px solid var(--border-color);
-      color: var(--text-color);
-      padding: 8px 16px;
-      border-radius: 20px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.2s ease;
-    }
-
-    .date-btn.active, .date-btn:hover {
-      background-color: var(--accent-color);
-      border-color: var(--accent-color);
-    }
-
-    .embed-container {
       position: relative;
-      padding-bottom: 56.25%;
-      height: 0;
-      overflow: hidden;
-      border-radius: 6px;
-      background-color: #000;
-      margin-bottom: 15px;
     }
+    body::before {
+      content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.10) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
+      z-index: 9999; background-size: 100% 4px, 6px 100%; pointer-events: none;
+    }
+    header { padding: 2rem; text-align: center; border-bottom: 1px solid #1f1f2e; }
+    .logo { font-family: 'Space Mono', monospace; font-size: 2.5rem; font-weight: 700; color: var(--text-main); text-shadow: 0 0 10px rgba(157, 78, 221, 0.5); }
+    .logo span { color: var(--accent-purple); }
+    .tagline { font-family: 'Space Mono', monospace; color: var(--accent-cyan); font-size: 0.9rem; margin-top: 0.5rem; letter-spacing: 2px; }
+    main { flex: 1; display: grid; grid-template-columns: 1fr; max-width: 1200px; width: 100%; margin: 0 auto; padding: 2rem; gap: 2rem; }
+    @media (min-width: 992px) { main { grid-template-columns: 1.1fr 0.9fr; } }
+    .player-section { display: flex; flex-direction: column; gap: 1.5rem; }
+    .player-panel { background: var(--panel-color); border: 1px solid #2a2a3a; padding: 1.5rem; border-radius: 8px; display: flex; flex-direction: column; gap: 1rem; }
+    .status-bar { display: flex; justify-content: space-between; align-items: center; font-family: 'Space Mono', monospace; font-size: 0.8rem; border-bottom: 1px solid #2a2a3a; padding-bottom: 0.75rem; }
+    .live-dot { width: 8px; height: 8px; background-color: #ff0055; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #ff0055; animation: blink 1.5s infinite; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .meta-display { margin-top: 0.5rem; }
+    .curator-header { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+    .curator-header span { color: var(--accent-cyan); }
+    .vibe-text { font-family: 'Space Mono', monospace; font-style: italic; color: var(--text-muted); font-size: 0.95rem; line-height: 1.4; margin-top: 0.5rem; }
+    
+    /* Interactive Like Button */
+    .like-btn { background: #1a1a26; border: 1px solid #3a3a52; color: #ff4757; padding: 0.4rem 0.8rem; font-family: 'Space Mono', monospace; font-size: 0.85rem; border-radius: 4px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.4rem; }
+    .like-btn:hover { border-color: #ff4757; background: #261520; transform: scale(1.05); }
 
-    .embed-container iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: 0;
-    }
+    /* Lineup / Timeline Grid */
+    .timeline-container { background: var(--panel-color); border: 1px solid #2a2a3a; padding: 1.5rem; border-radius: 8px; display: flex; flex-direction: column; gap: 1rem; }
+    .timeline-title { font-family: 'Space Mono', monospace; font-size: 0.9rem; color: var(--accent-purple); letter-spacing: 1px; text-transform: uppercase; }
+    .timeline-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+    @media (min-width: 576px) { .timeline-grid { grid-template-columns: repeat(7, 1fr); } }
+    .timeline-card { background: #171722; border: 1px solid #2d2d3f; padding: 0.75rem; border-radius: 4px; display: flex; flex-direction: column; gap: 0.4rem; text-decoration: none; color: inherit; transition: transform 0.2s, border-color 0.2s; cursor: pointer; }
+    .timeline-card:not(.disabled):hover { transform: translateY(-2px); border-color: var(--accent-cyan); }
+    .timeline-card.past { opacity: 0.65; border-color: #1f1f2e; }
+    .timeline-card.today { border-color: var(--accent-cyan); box-shadow: 0 0 10px rgba(0, 245, 212, 0.2); background: #121e1f; }
+    .timeline-card.future { border-color: #1f1f2e; opacity: 0.35; cursor: not-allowed; }
+    .timeline-card.selected { border-color: var(--accent-purple) !important; box-shadow: 0 0 12px rgba(157, 78, 221, 0.4) !important; }
+    .card-date { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--text-muted); }
+    .timeline-card.today .card-date { color: var(--accent-cyan); font-weight: bold; }
+    .card-name { font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-loc { font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .burn-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
+    /* Per-Day Comments Log */
+    .comments-container { background: var(--panel-color); border: 1px solid #2a2a3a; padding: 1.5rem; border-radius: 8px; display: flex; flex-direction: column; gap: 1rem; }
+    .comments-title { font-family: 'Space Mono', monospace; font-size: 0.9rem; color: var(--accent-cyan); letter-spacing: 1px; text-transform: uppercase; }
+    .comments-list { display: flex; flex-direction: column; gap: 0.8rem; max-height: 250px; overflow-y: auto; padding-right: 0.5rem; }
+    .comment-card { background: #171722; border: 1px solid #2a2a3a; padding: 0.75rem; border-radius: 4px; display: flex; flex-direction: column; gap: 0.2rem; }
+    .comment-author { font-family: 'Space Mono', monospace; font-size: 0.8rem; color: var(--accent-purple); font-weight: bold; }
+    .comment-body { font-size: 0.85rem; color: var(--text-main); line-height: 1.3; }
+    .comment-form { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+    .comment-form input { background: #1a1a26; border: 1px solid #3a3a52; padding: 0.6rem; border-radius: 4px; color: #fff; font-size: 0.85rem; }
+    .comment-form input[type="text"] { flex: 1; }
+    .comment-form button { background: var(--accent-purple); color: #fff; border: none; padding: 0.6rem 1rem; font-family: 'Space Mono', monospace; font-weight: bold; border-radius: 4px; cursor: pointer; }
 
-    .like-btn {
-      background: none;
-      border: 1px solid var(--accent-color);
-      color: var(--accent-color);
-      padding: 8px 16px;
-      border-radius: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-weight: bold;
-    }
-
-    .like-btn:hover {
-      background-color: var(--accent-color);
-      color: #fff;
-    }
-
-    .comment-section {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-
-    .comment-form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .form-row {
-      display: flex;
-      gap: 10px;
-    }
-
-    input[type="text"] {
-      background-color: var(--bg-color);
-      border: 1px solid var(--border-color);
-      color: var(--text-color);
-      padding: 10px;
-      border-radius: 4px;
-      font-size: 0.9rem;
-    }
-
-    input[type="text"]:focus {
-      outline: none;
-      border-color: var(--accent-color);
-    }
-
-    .submit-btn {
-      background-color: var(--accent-color);
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    .comment-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      max-height: 300px;
-      overflow-y: auto;
-    }
-
-    .comment-item {
-      background-color: rgba(255, 255, 255, 0.03);
-      padding: 10px;
-      border-radius: 4px;
-      border-left: 3px solid var(--accent-color);
-    }
-
-    .comment-author {
-      font-weight: bold;
-      font-size: 0.85rem;
-      color: var(--muted-text);
-      margin-bottom: 4px;
-    }
-
-    .comment-body {
-      font-size: 0.95rem;
-      word-break: break-word;
-    }
+    .form-section { background: var(--panel-color); border: 1px solid #2a2a3a; padding: 1.5rem; border-radius: 8px; display: flex; flex-direction: column; gap: 1.2rem; align-self: start; }
+    .form-section h2 { font-size: 1.3rem; border-bottom: 1px solid #2a2a3a; padding-bottom: 0.5rem; font-family: 'Space Mono', monospace; color: var(--accent-purple); white-space: nowrap; }
+    .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+    .form-group label { font-family: 'Space Mono', monospace; font-size: 0.8rem; color: var(--text-muted); }
+    .form-group input, .form-group textarea { background: #1a1a26; border: 1px solid #3a3a52; padding: 0.75rem; border-radius: 4px; color: #fff; font-family: inherit; font-size: 0.95rem; }
+    .submit-btn { background: linear-gradient(45deg, var(--accent-purple), #7b2cbf); color: white; border: none; padding: 0.8rem; font-family: 'Space Mono', monospace; font-weight: 700; border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+    footer { text-align: center; padding: 2rem; color: var(--text-muted); font-family: 'Space Mono', monospace; font-size: 0.8rem; border-top: 1px solid #1f1f2e; }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>myburn.global</h1>
-    <div class="sub-heading">daily curated mixtapes & soundscapes</div>
+    <div class="logo">my<span>burn</span></div>
+    <div class="tagline">// ONE GLOBAL MIXTAPE EVERY 24 HOURS</div>
   </header>
 
   <main>
-    <section class="card">
-      <div id="date-nav" class="date-selector">
-        <!-- Date buttons dynamically populated -->
-      </div>
-
-      <div id="player-container" class="embed-container">
-        <!-- Spotify/Audio Embed loaded here -->
-      </div>
-
-      <div class="burn-meta">
-        <div>
-          <h2 id="burn-title" style="margin: 0; font-size: 1.2rem;">Loading...</h2>
-          <span id="burn-curator" class="sub-heading">--</span>
+    <div class="player-section">
+      <section class="player-panel">
+        <div class="status-bar">
+          <div><span class="live-dot"></span> ON AIR</div>
+          <div id="display-date">LOADING CONSOLE DATA...</div>
         </div>
-        <button id="like-button" class="like-btn" onclick="submitLike()">
-          🔥 <span id="like-count">0</span>
-        </button>
-      </div>
-    </section>
-
-    <section class="card comment-section">
-      <h3>Discussion</h3>
-      
-      <form class="comment-form" onsubmit="submitComment(event)">
-        <div class="form-row">
-          <input type="text" id="comment-name" placeholder="Handle" style="width: 30%;" maxlength="30" required>
-          <input type="text" id="comment-text" placeholder="Drop a thought on this burn..." style="width: 70%;" maxlength="300" required>
+        
+        <div id="player-container">
+          <div style="height: 352px; background: #1a1a26; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: var(--text-muted); font-family: monospace;">
+            CONNECTING TO DECK SLOTS...
+          </div>
         </div>
-        <button type="submit" id="submit-btn" class="submit-btn">Post Comment</button>
+
+        <div class="meta-display">
+          <div class="curator-header">
+            <div>Today's Burn by <span id="curator-name">------</span></div>
+            <button class="like-btn" onclick="submitLike()">
+              🔥 <span id="like-count">0</span>
+            </button>
+          </div>
+          <div id="playlist-vibe" class="vibe-text">"Syncing streaming grid array tracking nodes..."</div>
+        </div>
+      </section>
+
+      <section class="timeline-container">
+        <div class="timeline-title">// BURN LINEUP</div>
+        <div id="timeline-grid" class="timeline-grid"></div>
+      </section>
+
+      <section class="comments-container">
+        <div class="comments-title">// DAY TRANSMISSION LOG (COMMENTS)</div>
+        <div id="comments-list" class="comments-list">
+          <div style="font-size:0.8rem; color:var(--text-muted); font-family:monospace;">No transmissions logged for this date.</div>
+        </div>
+        <form class="comment-form" onsubmit="handleCommentSubmit(event)">
+          <input type="text" id="comment-name" placeholder="Handle" style="width: 30%;" required>
+          <input type="text" id="comment-text" placeholder="Drop a thought on this burn..." required>
+          <button type="submit">SEND</button>
+        </form>
+      </section>
+    </div>
+
+    <section class="form-section">
+      <h2>BURN FOR THE WORLD</h2>
+      <form id="submission-form" onsubmit="handleFormSubmit(event)">
+        <div class="form-group">
+          <label for="name">Handle / Name</label>
+          <input type="text" id="name" name="name" required placeholder="e.g., retro_driver99">
+        </div>
+        <div class="form-group">
+          <label for="location">Your Location</label>
+          <input type="text" id="location" name="location" required placeholder="e.g., Tokyo, Japan">
+        </div>
+        <div class="form-group">
+          <label for="link">Public Spotify Playlist Link</label>
+          <input type="url" id="link" name="link" required placeholder="https://open.spotify.com/playlist/...">
+        </div>
+        <div class="form-group">
+          <label for="vibe">The Vibe (One sentence context)</label>
+          <textarea id="vibe" name="vibe" rows="3" required placeholder="Late night rain highway racing electronics..."></textarea>
+        </div>
+        <button type="submit" id="submit-btn" class="submit-btn">Burn Music</button>
       </form>
-
-      <div id="comment-list" class="comment-list">
-        <!-- Comments dynamically rendered -->
-      </div>
     </section>
   </main>
 
+  <footer>
+    <p>&copy; 2026 myburn.audio // structural automated grid execution system</p>
+  </footer>
+
   <script>
-    // -------------------------------------------------------------
-    // REPLACE THIS WITH YOUR GOOGLE APPS SCRIPT WEB APP URL
-    // -------------------------------------------------------------
     const GOOGLE_APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzBiO81Vv3RZ_M3bJRsg5Nt_gWLUEVVartRGeRCGyTkBWeFqbmJDoaHxMOzJ35moXMS/exec";
 
-    let appData = { schedule: [], comments: [], likes: {} };
-    let currentSelectedDate = '';
+    let globalSchedule = [];
+    let globalComments = [];
+    let globalLikes = {};
+    let todayStr = "";
+    let activeDateStr = "";
 
-    async function loadData() {
+    function formatDateISO(dateObj) {
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function cleanGoogleDateString(rawDateStr) {
+      if (!rawDateStr) return "";
+      const cleanStr = rawDateStr.toString().trim();
+      if (cleanStr.match(/^\d{4}-\d{2}-\d{2}$/)) return cleanStr;
+      if (cleanStr.includes('T')) return cleanStr.split('T')[0];
+      const parsedTimestamp = Date.parse(cleanStr);
+      if (!isNaN(parsedTimestamp)) return formatDateISO(new Date(parsedTimestamp));
+      return cleanStr;
+    }
+
+    function getSpotifyEmbedUrl(url) {
+      if (!url || !url.includes("open.spotify.com/playlist/")) return null;
+      const playlistId = url.split("playlist/")[1].split("?")[0];
+      return `https://open.spotify.com/embed/playlist/${playlistId}?utm_source=generator&theme=0`;
+    }
+
+    function generateTargetTimelineArray() {
+      const targetDates = [];
+      const today = new Date();
+      for (let i = -3; i <= 3; i++) {
+        const baseDate = new Date(today);
+        baseDate.setDate(baseDate.getDate() + i);
+        targetDates.push(formatDateISO(baseDate));
+      }
+      return targetDates;
+    }
+
+    async function initializeSystem() {
+      todayStr = formatDateISO(new Date());
+
       try {
-        const response = await fetch(GOOGLE_APP_SCRIPT_URL);
-        appData = await response.json();
+        const response = await fetch(`${GOOGLE_APP_SCRIPT_URL}?t=${Date.now()}`);
+        if (!response.ok) throw new Error("Connection failed");
         
-        if (appData.schedule && appData.schedule.length > 0) {
-          buildDateNav();
-          if (!currentSelectedDate) {
-            currentSelectedDate = cleanDateStr(appData.schedule[0].date);
-          }
-          renderActiveDay();
-        }
-      } catch (err) {
-        console.error("Failed to load application data:", err);
-      }
-    }
+        const data = await response.json();
+        
+        globalSchedule = (data.schedule || []).map(row => ({
+          name: row["name"] || "Anonymous",
+          location: row["location"] || "Global",
+          link: row["playlist link"] || "",
+          writeup: row["write-up"] || row["writeup"] || "",
+          date: cleanGoogleDateString(row["scheduled date"])
+        })).filter(r => r.date !== "");
 
-    function cleanDateStr(val) {
-      if (!val) return '';
-      const s = val.toString().trim();
-      return s.includes('T') ? s.split('T')[0] : s;
-    }
+        globalComments = data.comments || [];
+        globalLikes = data.likes || {};
 
-    function buildDateNav() {
-      const navContainer = document.getElementById('date-nav');
-      navContainer.innerHTML = '';
-
-      appData.schedule.forEach((entry, index) => {
-        const entryDate = cleanDateStr(entry.date);
-        const btn = document.createElement('button');
-        btn.className = `date-btn ${entryDate === currentSelectedDate ? 'active' : ''}`;
-        btn.innerText = entryDate || `Day ${index + 1}`;
-        btn.onclick = () => {
-          currentSelectedDate = entryDate;
-          buildDateNav();
-          renderActiveDay();
+        const activeItem = globalSchedule.find(item => item.date === todayStr) || globalSchedule[0] || {
+          name: "UNANNOUNCED", location: "SYSTEM", link: "", writeup: "No active mixtape for today.", date: todayStr
         };
-        navContainer.appendChild(btn);
-      });
-    }
 
-    function renderActiveDay() {
-      const activeEntry = appData.schedule.find(item => cleanDateStr(item.date) === currentSelectedDate) || appData.schedule[0];
-      
-      document.getElementById('burn-title').innerText = activeEntry.title || 'Untitled Burn';
-      document.getElementById('burn-curator').innerText = activeEntry.curator ? `Curated by ${activeEntry.curator}` : '';
-      
-      const playerContainer = document.getElementById('player-container');
-      if (activeEntry.embed) {
-        playerContainer.innerHTML = activeEntry.embed;
-      } else if (activeEntry.spotify_id) {
-        playerContainer.innerHTML = `<iframe src="https://open.spotify.com/embed/playlist/${activeEntry.spotify_id}" allow="encrypted-media"></iframe>`;
-      } else {
-        playerContainer.innerHTML = `<div style="display:flex;justify-content:center;align-items:center;height:100%;color:#888;">No stream configured</div>`;
+        activeDateStr = activeItem.date;
+        renderActivePlayer(activeItem);
+        renderTimelineGrid(activeItem.date);
+        renderComments(activeItem.date);
+
+      } catch (err) {
+        console.error("Matrix connection error:", err);
       }
-
-      // Render Likes
-      const totalLikes = appData.likes[currentSelectedDate] || 0;
-      document.getElementById('like-count').innerText = totalLikes;
-
-      // Render Comments
-      renderComments();
     }
 
-    function renderComments() {
-      const commentList = document.getElementById('comment-list');
-      commentList.innerHTML = '';
+    function renderActivePlayer(item) {
+      activeDateStr = item.date;
+      document.getElementById("display-date").textContent = item.date;
+      document.getElementById("curator-name").innerHTML = `${escapeHtml(item.name)} <span style="font-size:0.9rem; font-weight:normal; color:var(--text-muted);">&bull; ${escapeHtml(item.location)}</span>`;
+      document.getElementById("playlist-vibe").textContent = `"${escapeHtml(item.writeup)}"`;
+      document.getElementById("like-count").textContent = globalLikes[item.date] || 0;
 
-      const dayComments = appData.comments.filter(c => cleanDateStr(c.date) === currentSelectedDate);
+      const embedUrl = getSpotifyEmbedUrl(item.link);
+      const container = document.getElementById("player-container");
+      container.innerHTML = embedUrl ? `<iframe src="${embedUrl}" width="100%" height="352" frameborder="0" allow="encrypted-media" style="border-radius: 8px;" loading="lazy"></iframe>` : `<div style="height: 352px; background: #1a1a26; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: var(--text-muted); font-family: monospace;">[SPOTIFY LINK UNSET]</div>`;
+    }
+
+    function renderTimelineGrid(selectedDateStr) {
+      const timelineDates = generateTargetTimelineArray();
+      const gridContainer = document.getElementById("timeline-grid");
+
+      gridContainer.innerHTML = timelineDates.map(dStr => {
+        const isFuture = dStr > todayStr;
+        const entry = globalSchedule.find(r => r.date === dStr) || { date: dStr, name: "UNANNOUNCED", location: "---" };
+
+        let cardClass = "timeline-card";
+        if (dStr === todayStr) cardClass += " today";
+        else if (dStr < todayStr) cardClass += " past";
+        else cardClass += " future disabled";
+
+        if (dStr === selectedDateStr) cardClass += " selected";
+
+        const labelDate = dStr === todayStr ? "TODAY" : dStr.slice(5);
+        const clickHandler = isFuture ? '' : `onclick="selectTimelineCard('${dStr}')"`;
+
+        return `
+          <div class="${cardClass}" ${clickHandler}>
+            <div class="card-date">${labelDate}</div>
+            <div class="card-name">${escapeHtml(entry.name)}</div>
+            <div class="card-loc">${escapeHtml(entry.location)}</div>
+          </div>`;
+      }).join('');
+    }
+
+    function renderComments(dStr) {
+      const list = document.getElementById("comments-list");
+      const dayComments = globalComments.filter(c => cleanGoogleDateString(c.date) === dStr);
 
       if (dayComments.length === 0) {
-        commentList.innerHTML = `<div style="color: var(--muted-text); font-size: 0.9rem;">No thoughts shared yet. Be the first!</div>`;
+        list.innerHTML = `<div style="font-size:0.8rem; color:var(--text-muted); font-family:monospace;">No transmissions logged for this date.</div>`;
         return;
       }
 
-      dayComments.reverse().forEach(c => {
-        const item = document.createElement('div');
-        item.className = 'comment-item';
-        item.innerHTML = `
+      list.innerHTML = dayComments.map(c => `
+        <div class="comment-card">
           <div class="comment-author">${escapeHtml(c.name || 'Anonymous')}</div>
           <div class="comment-body">${escapeHtml(c.comment || '')}</div>
-        `;
-        commentList.appendChild(item);
-      });
+        </div>
+      `).join('');
+      
+      list.scrollTop = list.scrollHeight;
     }
 
-    async function submitComment(e) {
-      e.preventDefault();
-
-      const nameInput = document.getElementById('comment-name');
-      const commentInput = document.getElementById('comment-text');
-      const submitBtn = document.getElementById('submit-btn');
-
-      const name = nameInput.value.trim();
-      const comment = commentInput.value.trim();
-
-      if (!comment) return;
-
-      submitBtn.disabled = true;
-      submitBtn.innerText = 'Verifying...';
-
-      const payload = {
-        action: 'addComment',
-        date: currentSelectedDate,
-        name: name || 'Anonymous',
-        comment: comment
-      };
-
-      try {
-        const response = await fetch(GOOGLE_APP_SCRIPT_URL, {
-          method: 'POST',
-          body: JSON.stringify(payload)
-        });
-
-        const result = await response.json();
-
-        if (result.status === 'success') {
-          // Clear inputs on success
-          commentInput.value = '';
-          nameInput.value = '';
-          // Re-fetch clean data from Google Sheets before updating UI
-          await loadData();
-        } else {
-          // Blocked by moderation — do NOT render on screen
-          alert('Your comment was flagged by the moderation filter.');
-        }
-      } catch (err) {
-        console.error('Submission error:', err);
-        alert('Failed to connect to moderation service. Please try again.');
-      } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerText = 'Post Comment';
-      }
+    function selectTimelineCard(dStr) {
+      if (dStr > todayStr) return;
+      const selected = globalSchedule.find(r => r.date === dStr) || { date: dStr, name: "UNANNOUNCED", location: "SYSTEM", link: "", writeup: "Slot unassigned." };
+      renderActivePlayer(selected);
+      renderTimelineGrid(dStr);
+      renderComments(dStr);
     }
 
     async function submitLike() {
-      const likeBtn = document.getElementById('like-button');
-      likeBtn.disabled = true;
+      globalLikes[activeDateStr] = (globalLikes[activeDateStr] || 0) + 1;
+      document.getElementById("like-count").textContent = globalLikes[activeDateStr];
 
-      const payload = {
-        action: 'addLike',
-        date: currentSelectedDate
-      };
+      await fetch(GOOGLE_APP_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "addLike", date: activeDateStr })
+      });
+    }
 
-      try {
-        const response = await fetch(GOOGLE_APP_SCRIPT_URL, {
-          method: 'POST',
-          body: JSON.stringify(payload)
-        });
-        const result = await response.json();
-        if (result.status === 'success') {
-          appData.likes[currentSelectedDate] = (appData.likes[currentSelectedDate] || 0) + 1;
-          document.getElementById('like-count').innerText = appData.likes[currentSelectedDate];
-        }
-      } catch (err) {
-        console.error('Like error:', err);
-      } finally {
-        likeBtn.disabled = false;
-      }
+    async function handleCommentSubmit(e) {
+  e.preventDefault();
+  const nameInput = document.getElementById("comment-name");
+  const textInput = document.getElementById("comment-text");
+
+  const nameVal = nameInput ? nameInput.value.trim() : "";
+  const commentVal = textInput ? textInput.value.trim() : "";
+
+  if (!commentVal) return;
+
+  const newComment = { 
+    action: "addComment",
+    date: activeDateStr, 
+    name: nameVal || "Anonymous", 
+    comment: commentVal 
+  };
+
+  try {
+    const response = await fetch(GOOGLE_APP_SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify(newComment)
+    });
+
+    const result = await response.json();
+
+    if (result.status === "success") {
+      globalComments.push({ 
+        date: activeDateStr, 
+        name: newComment.name, 
+        comment: newComment.comment 
+      });
+      renderComments(activeDateStr);
+      textInput.value = "";
+    } else {
+      alert("Your comment was flagged by the moderation filter.");
+    }
+  } catch (err) {
+    console.error("Submission error:", err);
+    alert("Failed to submit comment. Please try again.");
+  }
+}
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById("submit-btn");
+      btn.textContent = "BURNED TO BUFFER!";
+      btn.style.background = "var(--accent-cyan)";
+      btn.style.color = "#000";
+
+      setTimeout(() => {
+        document.getElementById("submission-form").reset();
+        btn.textContent = "Burn Music";
+        btn.style.background = "linear-gradient(45deg, var(--accent-purple), #7b2cbf)";
+        btn.style.color = "#fff";
+      }, 2000);
     }
 
     function escapeHtml(str) {
-      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+      return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
 
-    // Initialize application
-    loadData();
+    window.addEventListener('DOMContentLoaded', initializeSystem);
   </script>
 </body>
 </html>
