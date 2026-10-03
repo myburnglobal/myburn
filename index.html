@@ -28,46 +28,59 @@
     }
     body::before {
       content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.10) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
       z-index: 9999; background-size: 100% 4px, 6px 100%; pointer-events: none;
     }
     header { padding: 2rem; text-align: center; border-bottom: 1px solid #1f1f2e; }
-    .logo {
-      font-family: 'Space Mono', monospace; font-size: 2.5rem; font-weight: 700;
-      color: var(--text-main); text-shadow: 0 0 10px rgba(157, 78, 221, 0.5);
-    }
+    .logo { font-family: 'Space Mono', monospace; font-size: 2.5rem; font-weight: 700; color: var(--text-main); text-shadow: 0 0 10px rgba(157, 78, 221, 0.5); }
     .logo span { color: var(--accent-purple); }
     .tagline { font-family: 'Space Mono', monospace; color: var(--accent-cyan); font-size: 0.9rem; margin-top: 0.5rem; letter-spacing: 2px; }
     main { flex: 1; display: grid; grid-template-columns: 1fr; max-width: 1200px; width: 100%; margin: 0 auto; padding: 2rem; gap: 2rem; }
-    @media (min-width: 992px) { main { grid-template-columns: 1.3fr 0.7fr; } }
+    @media (min-width: 992px) { main { grid-template-columns: 1.1fr 0.9fr; } }
     .player-section { display: flex; flex-direction: column; gap: 1.5rem; }
     .player-panel { background: var(--panel-color); border: 1px solid #2a2a3a; padding: 1.5rem; border-radius: 8px; display: flex; flex-direction: column; gap: 1rem; }
     .status-bar { display: flex; justify-content: space-between; align-items: center; font-family: 'Space Mono', monospace; font-size: 0.8rem; border-bottom: 1px solid #2a2a3a; padding-bottom: 0.75rem; }
     .live-dot { width: 8px; height: 8px; background-color: #ff0055; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #ff0055; animation: blink 1.5s infinite; }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
     .meta-display { margin-top: 0.5rem; }
-    .curator-header { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .curator-header { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
     .curator-header span { color: var(--accent-cyan); }
     .vibe-text { font-family: 'Space Mono', monospace; font-style: italic; color: var(--text-muted); font-size: 0.95rem; line-height: 1.4; margin-top: 0.5rem; }
     
-    /* 7-Day Timeline Layout Matrix Elements Styles */
+    /* Interactive Like Button */
+    .like-btn { background: #1a1a26; border: 1px solid #3a3a52; color: #ff4757; padding: 0.4rem 0.8rem; font-family: 'Space Mono', monospace; font-size: 0.85rem; border-radius: 4px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; gap: 0.4rem; }
+    .like-btn:hover { border-color: #ff4757; background: #261520; transform: scale(1.05); }
+
+    /* Lineup / Timeline Grid */
     .timeline-container { background: var(--panel-color); border: 1px solid #2a2a3a; padding: 1.5rem; border-radius: 8px; display: flex; flex-direction: column; gap: 1rem; }
     .timeline-title { font-family: 'Space Mono', monospace; font-size: 0.9rem; color: var(--accent-purple); letter-spacing: 1px; text-transform: uppercase; }
     .timeline-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
     @media (min-width: 576px) { .timeline-grid { grid-template-columns: repeat(7, 1fr); } }
     .timeline-card { background: #171722; border: 1px solid #2d2d3f; padding: 0.75rem; border-radius: 4px; display: flex; flex-direction: column; gap: 0.4rem; text-decoration: none; color: inherit; transition: transform 0.2s, border-color 0.2s; cursor: pointer; }
-    .timeline-card:hover { transform: translateY(-2px); border-color: var(--accent-cyan); }
+    .timeline-card:not(.disabled):hover { transform: translateY(-2px); border-color: var(--accent-cyan); }
     .timeline-card.past { opacity: 0.65; border-color: #1f1f2e; }
     .timeline-card.today { border-color: var(--accent-cyan); box-shadow: 0 0 10px rgba(0, 245, 212, 0.2); background: #121e1f; }
-    .timeline-card.future { border-color: rgba(157, 78, 221, 0.3); opacity: 0.7; }
+    .timeline-card.future { border-color: #1f1f2e; opacity: 0.35; cursor: not-allowed; }
     .timeline-card.selected { border-color: var(--accent-purple) !important; box-shadow: 0 0 12px rgba(157, 78, 221, 0.4) !important; }
     .card-date { font-family: 'Space Mono', monospace; font-size: 0.7rem; color: var(--text-muted); }
     .timeline-card.today .card-date { color: var(--accent-cyan); font-weight: bold; }
     .card-name { font-size: 0.85rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .card-loc { font-size: 0.7rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
+    /* Per-Day Comments Log */
+    .comments-container { background: var(--panel-color); border: 1px solid #2a2a3a; padding: 1.5rem; border-radius: 8px; display: flex; flex-direction: column; gap: 1rem; }
+    .comments-title { font-family: 'Space Mono', monospace; font-size: 0.9rem; color: var(--accent-cyan); letter-spacing: 1px; text-transform: uppercase; }
+    .comments-list { display: flex; flex-direction: column; gap: 0.8rem; max-height: 250px; overflow-y: auto; padding-right: 0.5rem; }
+    .comment-card { background: #171722; border: 1px solid #2a2a3a; padding: 0.75rem; border-radius: 4px; display: flex; flex-direction: column; gap: 0.2rem; }
+    .comment-author { font-family: 'Space Mono', monospace; font-size: 0.8rem; color: var(--accent-purple); font-weight: bold; }
+    .comment-body { font-size: 0.85rem; color: var(--text-main); line-height: 1.3; }
+    .comment-form { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+    .comment-form input { background: #1a1a26; border: 1px solid #3a3a52; padding: 0.6rem; border-radius: 4px; color: #fff; font-size: 0.85rem; }
+    .comment-form input[type="text"] { flex: 1; }
+    .comment-form button { background: var(--accent-purple); color: #fff; border: none; padding: 0.6rem 1rem; font-family: 'Space Mono', monospace; font-weight: bold; border-radius: 4px; cursor: pointer; }
+
     .form-section { background: var(--panel-color); border: 1px solid #2a2a3a; padding: 1.5rem; border-radius: 8px; display: flex; flex-direction: column; gap: 1.2rem; align-self: start; }
-    .form-section h2 { font-size: 1.3rem; border-bottom: 1px solid #2a2a3a; padding-bottom: 0.5rem; font-family: 'Space Mono', monospace; color: var(--accent-purple); }
+    .form-section h2 { font-size: 1.3rem; border-bottom: 1px solid #2a2a3a; padding-bottom: 0.5rem; font-family: 'Space Mono', monospace; color: var(--accent-purple); white-space: nowrap; }
     .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
     .form-group label { font-family: 'Space Mono', monospace; font-size: 0.8rem; color: var(--text-muted); }
     .form-group input, .form-group textarea { background: #1a1a26; border: 1px solid #3a3a52; padding: 0.75rem; border-radius: 4px; color: #fff; font-family: inherit; font-size: 0.95rem; }
@@ -83,10 +96,7 @@
   </header>
 
   <main>
-    <!-- Left Hand Side Display Frame Section -->
     <div class="player-section">
-      
-      <!-- Primary Operational Live Music Core Player Display Deck Box -->
       <section class="player-panel">
         <div class="status-bar">
           <div><span class="live-dot"></span> ON AIR</div>
@@ -100,22 +110,34 @@
         </div>
 
         <div class="meta-display">
-          <div class="curator-header">Today's Selection by <span id="curator-name">------</span></div>
+          <div class="curator-header">
+            <div>Today's Burn by <span id="curator-name">------</span></div>
+            <button class="like-btn" onclick="submitLike()">
+              🔥 <span id="like-count">0</span>
+            </button>
+          </div>
           <div id="playlist-vibe" class="vibe-text">"Syncing streaming grid array tracking nodes..."</div>
         </div>
       </section>
 
-      <!-- The Automated Continuous 7-Day Timeline Matrix Layout Grid Segment -->
       <section class="timeline-container">
-        <div class="timeline-title">// ROTATION LINEUP (3 DAYS PAST // 3 DAYS FUTURE)</div>
-        <div id="timeline-grid" class="timeline-grid">
-          <!-- Generation placeholders mapped natively inside the structural JS module execution below -->
-        </div>
+        <div class="timeline-title">// BURN LINEUP</div>
+        <div id="timeline-grid" class="timeline-grid"></div>
       </section>
 
+      <section class="comments-container">
+        <div class="comments-title">// DAY TRANSMISSION LOG (COMMENTS)</div>
+        <div id="comments-list" class="comments-list">
+          <div style="font-size:0.8rem; color:var(--text-muted); font-family:monospace;">No transmissions logged for this date.</div>
+        </div>
+        <form class="comment-form" onsubmit="handleCommentSubmit(event)">
+          <input type="text" id="comment-name" placeholder="Handle" style="width: 30%;" required>
+          <input type="text" id="comment-text" placeholder="Drop a thought on this burn..." required>
+          <button type="submit">SEND</button>
+        </form>
+      </section>
     </div>
 
-    <!-- Right Hand Side: Content Submissions Pipeline Entry Form Section -->
     <section class="form-section">
       <h2>BURN FOR THE WORLD</h2>
       <form id="submission-form" onsubmit="handleFormSubmit(event)">
@@ -135,7 +157,7 @@
           <label for="vibe">The Vibe (One sentence context)</label>
           <textarea id="vibe" name="vibe" rows="3" required placeholder="Late night rain highway racing electronics..."></textarea>
         </div>
-        <button type="submit" id="submit-btn" class="submit-btn">Inject Music</button>
+        <button type="submit" id="submit-btn" class="submit-btn">Burn Music</button>
       </form>
     </section>
   </main>
@@ -145,11 +167,13 @@
   </footer>
 
   <script>
-    // Paste your deployed Apps Script URL here:
-    const GOOGLE_APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx-x3kh2Q799rby1kkam7Sg1yo1zx6VMOrkRM45f5IidQaHN_pOu471l6lAlnMxenSC/exec";
+    const GOOGLE_APP_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyF4P6erOMUHrzlUHmXkYeaGzoM8-mcmB3vfjP5FGVyj8HUyp5qoEjggN2rFrNTg-1D/exec";
 
     let globalSchedule = [];
+    let globalComments = [];
+    let globalLikes = {};
     let todayStr = "";
+    let activeDateStr = "";
 
     function formatDateISO(dateObj) {
       const year = dateObj.getFullYear();
@@ -164,21 +188,14 @@
       if (cleanStr.match(/^\d{4}-\d{2}-\d{2}$/)) return cleanStr;
       if (cleanStr.includes('T')) return cleanStr.split('T')[0];
       const parsedTimestamp = Date.parse(cleanStr);
-      if (!isNaN(parsedTimestamp)) {
-        const parsedDate = new Date(parsedTimestamp);
-        return formatDateISO(parsedDate);
-      }
+      if (!isNaN(parsedTimestamp)) return formatDateISO(new Date(parsedTimestamp));
       return cleanStr;
     }
 
     function getSpotifyEmbedUrl(url) {
-      if (!url) return null;
-      if (url.includes("open.spotify.com/playlist/")) {
-        const parts = url.split("playlist/");
-        const playlistId = parts[1].split("?")[0];
-        return `https://open.spotify.com/embed/playlist/${playlistId}?utm_source=generator&theme=0`;
-      }
-      return url;
+      if (!url || !url.includes("open.spotify.com/playlist/")) return null;
+      const playlistId = url.split("playlist/")[1].split("?")[0];
+      return `https://open.spotify.com/embed/playlist/${playlistId}?utm_source=generator&theme=0`;
     }
 
     function generateTargetTimelineArray() {
@@ -199,63 +216,43 @@
         const response = await fetch(`${GOOGLE_APP_SCRIPT_URL}?t=${Date.now()}`);
         if (!response.ok) throw new Error("Connection failed");
         
-        const rawData = await response.json();
+        const data = await response.json();
         
-        // Normalize object keys from Google Sheets JSON response
-        globalSchedule = rawData.map(row => {
-          const keys = Object.keys(row);
-          const getVal = (target) => {
-            const k = keys.find(key => key.trim().toLowerCase() === target.toLowerCase());
-            return k ? row[k] : "";
-          };
+        globalSchedule = (data.schedule || []).map(row => ({
+          name: row["name"] || "Anonymous",
+          location: row["location"] || "Global",
+          link: row["playlist link"] || "",
+          writeup: row["write-up"] || row["writeup"] || "",
+          date: cleanGoogleDateString(row["scheduled date"])
+        })).filter(r => r.date !== "");
 
-          return {
-            name: getVal("name") || "Anonymous",
-            location: getVal("location") || "Global",
-            link: getVal("playlist link") || "",
-            writeup: getVal("write-up") || getVal("writeup") || "",
-            date: cleanGoogleDateString(getVal("scheduled date"))
-          };
-        }).filter(r => r.date !== "");
+        globalComments = data.comments || [];
+        globalLikes = data.likes || {};
 
-        // Find today's entry or fallback to closest row
         const activeItem = globalSchedule.find(item => item.date === todayStr) || globalSchedule[0] || {
-          name: "UNANNOUNCED",
-          location: "SYSTEM",
-          link: "",
-          writeup: "No active mixtape in rotation for today.",
-          date: todayStr
+          name: "UNANNOUNCED", location: "SYSTEM", link: "", writeup: "No active mixtape for today.", date: todayStr
         };
 
+        activeDateStr = activeItem.date;
         renderActivePlayer(activeItem);
         renderTimelineGrid(activeItem.date);
+        renderComments(activeItem.date);
 
       } catch (err) {
         console.error("Matrix connection error:", err);
-        document.getElementById("player-container").innerHTML = `
-          <div style="height: 352px; background: #1a1a26; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 8px; color: var(--accent-purple); font-family: monospace; padding: 20px; text-align: center;">
-            <div style="font-weight: bold; margin-bottom: 8px;">[DECK CONNECTION ERROR]</div>
-            Please verify your Google Apps Script Web App URL inside index.html
-          </div>`;
       }
     }
 
     function renderActivePlayer(item) {
+      activeDateStr = item.date;
       document.getElementById("display-date").textContent = item.date;
-      document.getElementById("curator-name").innerHTML = `${escapeHtml(item.name)} <span style="font-size: 0.9rem; font-weight: normal; color: var(--text-muted);">&bull; ${escapeHtml(item.location)}</span>`;
+      document.getElementById("curator-name").innerHTML = `${escapeHtml(item.name)} <span style="font-size:0.9rem; font-weight:normal; color:var(--text-muted);">&bull; ${escapeHtml(item.location)}</span>`;
       document.getElementById("playlist-vibe").textContent = `"${escapeHtml(item.writeup)}"`;
+      document.getElementById("like-count").textContent = globalLikes[item.date] || 0;
 
       const embedUrl = getSpotifyEmbedUrl(item.link);
       const container = document.getElementById("player-container");
-
-      if (embedUrl) {
-        container.innerHTML = `<iframe src="${embedUrl}" width="100%" height="352" frameborder="0" allowtransparency="true" allow="encrypted-media" style="border-radius: 8px;" loading="lazy"></iframe>`;
-      } else {
-        container.innerHTML = `
-          <div style="height: 352px; background: #1a1a26; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: var(--text-muted); font-family: monospace;">
-            [SPOTIFY LINK INVALID OR UNSET]
-          </div>`;
-      }
+      container.innerHTML = embedUrl ? `<iframe src="${embedUrl}" width="100%" height="352" frameborder="0" allow="encrypted-media" style="border-radius: 8px;" loading="lazy"></iframe>` : `<div style="height: 352px; background: #1a1a26; display: flex; align-items: center; justify-content: center; border-radius: 8px; color: var(--text-muted); font-family: monospace;">[SPOTIFY LINK UNSET]</div>`;
     }
 
     function renderTimelineGrid(selectedDateStr) {
@@ -263,23 +260,21 @@
       const gridContainer = document.getElementById("timeline-grid");
 
       gridContainer.innerHTML = timelineDates.map(dStr => {
-        const entry = globalSchedule.find(r => r.date === dStr) || {
-          date: dStr,
-          name: "UNANNOUNCED",
-          location: "---"
-        };
+        const isFuture = dStr > todayStr;
+        const entry = globalSchedule.find(r => r.date === dStr) || { date: dStr, name: "UNANNOUNCED", location: "---" };
 
         let cardClass = "timeline-card";
         if (dStr === todayStr) cardClass += " today";
         else if (dStr < todayStr) cardClass += " past";
-        else cardClass += " future";
+        else cardClass += " future disabled";
 
         if (dStr === selectedDateStr) cardClass += " selected";
 
         const labelDate = dStr === todayStr ? "TODAY" : dStr.slice(5);
+        const clickHandler = isFuture ? '' : `onclick="selectTimelineCard('${dStr}')"`;
 
         return `
-          <div class="${cardClass}" onclick="selectTimelineCard('${dStr}')">
+          <div class="${cardClass}" ${clickHandler}>
             <div class="card-date">${labelDate}</div>
             <div class="card-name">${escapeHtml(entry.name)}</div>
             <div class="card-loc">${escapeHtml(entry.location)}</div>
@@ -287,29 +282,74 @@
       }).join('');
     }
 
-    function selectTimelineCard(dStr) {
-      const selected = globalSchedule.find(r => r.date === dStr) || {
-        date: dStr,
-        name: "UNANNOUNCED",
-        location: "SYSTEM",
-        link: "",
-        writeup: "Slot unassigned in grid schedule."
-      };
+    function renderComments(dStr) {
+      const list = document.getElementById("comments-list");
+      const dayComments = globalComments.filter(c => cleanGoogleDateString(c.date) === dStr);
 
+      if (dayComments.length === 0) {
+        list.innerHTML = `<div style="font-size:0.8rem; color:var(--text-muted); font-family:monospace;">No transmissions logged for this date.</div>`;
+        return;
+      }
+
+      list.innerHTML = dayComments.map(c => `
+        <div class="comment-card">
+          <div class="comment-author">${escapeHtml(c.name || 'Anonymous')}</div>
+          <div class="comment-body">${escapeHtml(c.comment || '')}</div>
+        </div>
+      `).join('');
+      
+      list.scrollTop = list.scrollHeight;
+    }
+
+    function selectTimelineCard(dStr) {
+      if (dStr > todayStr) return;
+      const selected = globalSchedule.find(r => r.date === dStr) || { date: dStr, name: "UNANNOUNCED", location: "SYSTEM", link: "", writeup: "Slot unassigned." };
       renderActivePlayer(selected);
       renderTimelineGrid(dStr);
+      renderComments(dStr);
+    }
+
+    async function submitLike() {
+      globalLikes[activeDateStr] = (globalLikes[activeDateStr] || 0) + 1;
+      document.getElementById("like-count").textContent = globalLikes[activeDateStr];
+
+      await fetch(GOOGLE_APP_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "addLike", date: activeDateStr })
+      });
+    }
+
+    async function handleCommentSubmit(e) {
+      e.preventDefault();
+      const nameInput = document.getElementById("comment-name");
+      const textInput = document.getElementById("comment-text");
+
+      const newComment = { date: activeDateStr, name: nameInput.value, comment: textInput.value };
+      globalComments.push(newComment);
+      renderComments(activeDateStr);
+
+      textInput.value = "";
+
+      await fetch(GOOGLE_APP_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "addComment", ...newComment })
+      });
     }
 
     function handleFormSubmit(e) {
       e.preventDefault();
       const btn = document.getElementById("submit-btn");
-      btn.textContent = "INJECTED TO BUFFER!";
+      btn.textContent = "BURNED TO BUFFER!";
       btn.style.background = "var(--accent-cyan)";
       btn.style.color = "#000";
 
       setTimeout(() => {
         document.getElementById("submission-form").reset();
-        btn.textContent = "Inject Music";
+        btn.textContent = "Burn Music";
         btn.style.background = "linear-gradient(45deg, var(--accent-purple), #7b2cbf)";
         btn.style.color = "#fff";
       }, 2000);
@@ -319,7 +359,6 @@
       return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
 
-    // Initialize layout execution on window load
     window.addEventListener('DOMContentLoaded', initializeSystem);
   </script>
 </body>
