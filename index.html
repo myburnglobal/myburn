@@ -260,7 +260,6 @@
     function renderActivePlayer(item) {
       activeDateStr = item.date;
       document.getElementById("display-date").textContent = item.date;
-      // Location made larger, bolder, and highlighted in cyan
       document.getElementById("curator-name").innerHTML = `${escapeHtml(item.name)} <span style="font-size:1.1rem; font-weight:bold; color:var(--accent-cyan); margin-left:0.3rem;">&bull; ${escapeHtml(item.location)}</span>`;
       document.getElementById("playlist-vibe").textContent = `"${escapeHtml(item.writeup)}"`;
       document.getElementById("like-count").textContent = globalLikes[item.date] || 0;
@@ -334,83 +333,3 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "addLike", date: activeDateStr })
       });
-    }
-
-    async function handleCommentSubmit(e) {
-      e.preventDefault();
-      const nameInput = document.getElementById("comment-name");
-      const textInput = document.getElementById("comment-text");
-
-      const nameVal = nameInput ? nameInput.value.trim() : "";
-      const commentVal = textInput ? textInput.value.trim() : "";
-
-      if (!commentVal) return;
-
-      const newComment = { 
-        action: "addComment",
-        date: activeDateStr, 
-        name: nameVal || "Anonymous", 
-        comment: commentVal 
-      };
-
-      try {
-        const response = await fetch(GOOGLE_APP_SCRIPT_URL, {
-          method: "POST",
-          body: JSON.stringify(newComment)
-        });
-
-        const result = await response.json();
-
-        if (result.status === "success") {
-          gtag('event', 'comment_submitted', {
-            'event_category': 'Engagement',
-            'event_label': 'Successful Comment'
-          });
-
-          globalComments.push({ 
-            date: activeDateStr, 
-            name: newComment.name, 
-            comment: newComment.comment 
-          });
-          renderComments(activeDateStr);
-          textInput.value = "";
-        } else {
-          gtag('event', 'comment_rejected', {
-            'event_category': 'Moderation',
-            'event_label': result.message || 'Flagged by filter'
-          });
-
-          alert("Your comment was flagged by the moderation filter.");
-        }
-      } catch (err) {
-        console.error("Submission error:", err);
-        alert("Failed to submit comment. Please try again.");
-      }
-    }
-
-    function handleFormSubmit(e) {
-      e.preventDefault();
-      const btn = document.getElementById("submit-btn");
-      btn.textContent = "BURNED TO BUFFER!";
-      btn.style.background = "var(--accent-cyan)";
-      btn.style.color = "#000";
-
-      // You can capture form inputs here including the new email field:
-      // const emailVal = document.getElementById("email").value;
-
-      setTimeout(() => {
-        document.getElementById("submission-form").reset();
-        btn.textContent = "Burn Music";
-        btn.style.background = "linear-gradient(45deg, var(--accent-purple), #7b2cbf)";
-        btn.style.color = "#fff";
-      }, 2000);
-    }
-
-    function escapeHtml(str) {
-      return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-    }
-
-    window.addEventListener('DOMContentLoaded', initializeSystem);
-  </script>
-</body>
-</html>
