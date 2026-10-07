@@ -36,7 +36,7 @@
     }
     body::before {
       content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.01), rgba(0, 255, 0, 0.005), rgba(0, 0, 255, 0.01));
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.10) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
       z-index: 9999; background-size: 100% 4px, 6px 100%; pointer-events: none;
     }
     header { padding: 2rem; text-align: center; border-bottom: 1px solid #1f1f2e; }
@@ -88,8 +88,7 @@
     .comment-form button { background: var(--accent-purple); color: #fff; border: none; padding: 0.6rem 1rem; font-family: 'Space Mono', monospace; font-weight: bold; border-radius: 4px; cursor: pointer; }
 
     .form-section { background: var(--panel-color); border: 1px solid #2a2a3a; padding: 1.5rem; border-radius: 8px; display: flex; flex-direction: column; gap: 1.2rem; align-self: start; }
-    .form-section h2 { font-size: 1.3rem; font-family: 'Space Mono', monospace; color: var(--accent-purple); white-space: nowrap; }
-    .form-subtitle { font-family: 'Space Mono', monospace; font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; border-bottom: 1px solid #2a2a3a; padding-bottom: 0.75rem; margin-top: -0.5rem; }
+    .form-section h2 { font-size: 1.3rem; border-bottom: 1px solid #2a2a3a; padding-bottom: 0.5rem; font-family: 'Space Mono', monospace; color: var(--accent-purple); white-space: nowrap; }
     .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
     .form-group label { font-family: 'Space Mono', monospace; font-size: 0.8rem; color: var(--text-muted); }
     .form-group input, .form-group textarea { background: #1a1a26; border: 1px solid #3a3a52; padding: 0.75rem; border-radius: 4px; color: #fff; font-family: inherit; font-size: 0.95rem; }
@@ -148,19 +147,14 @@
     </div>
 
     <section class="form-section">
-      <h2>burn one for the world</h2>
-      <div class="form-subtitle">Tell us who you are and share a public Spotify playlist for a chance to share your burn</div>
+      <h2>BURN FOR THE WORLD</h2>
       <form id="submission-form" onsubmit="handleFormSubmit(event)">
         <div class="form-group">
-          <label for="name">Name</label>
+          <label for="name">Handle / Name</label>
           <input type="text" id="name" name="name" required placeholder="e.g., retro_driver99">
         </div>
         <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" required placeholder="you@example.com">
-        </div>
-        <div class="form-group">
-          <label for="location">Location</label>
+          <label for="location">Your Location</label>
           <input type="text" id="location" name="location" required placeholder="e.g., Tokyo, Japan">
         </div>
         <div class="form-group">
@@ -168,7 +162,7 @@
           <input type="url" id="link" name="link" required placeholder="https://open.spotify.com/playlist/...">
         </div>
         <div class="form-group">
-          <label for="vibe">The Vibe</label>
+          <label for="vibe">The Vibe (One sentence context)</label>
           <textarea id="vibe" name="vibe" rows="3" required placeholder="Late night rain highway racing electronics..."></textarea>
         </div>
         <button type="submit" id="submit-btn" class="submit-btn">Burn Music</button>
@@ -260,7 +254,7 @@
     function renderActivePlayer(item) {
       activeDateStr = item.date;
       document.getElementById("display-date").textContent = item.date;
-      document.getElementById("curator-name").innerHTML = `${escapeHtml(item.name)} <span style="font-size:1.1rem; font-weight:bold; color:var(--accent-cyan); margin-left:0.3rem;">&bull; ${escapeHtml(item.location)}</span>`;
+      document.getElementById("curator-name").innerHTML = `${escapeHtml(item.name)} <span style="font-size:0.9rem; font-weight:normal; color:var(--text-muted);">&bull; ${escapeHtml(item.location)}</span>`;
       document.getElementById("playlist-vibe").textContent = `"${escapeHtml(item.writeup)}"`;
       document.getElementById("like-count").textContent = globalLikes[item.date] || 0;
 
@@ -273,4 +267,170 @@
       const timelineDates = generateTargetTimelineArray();
       const gridContainer = document.getElementById("timeline-grid");
 
-      gridContainer
+      gridContainer.innerHTML = timelineDates.map(dStr => {
+        const isFuture = dStr > todayStr;
+        const entry = globalSchedule.find(r => r.date === dStr) || { date: dStr, name: "UNANNOUNCED", location: "---" };
+
+        let cardClass = "timeline-card";
+        if (dStr === todayStr) cardClass += " today";
+        else if (dStr < todayStr) cardClass += " past";
+        else cardClass += " future disabled";
+
+        if (dStr === selectedDateStr) cardClass += " selected";
+
+        const labelDate = dStr === todayStr ? "TODAY" : dStr.slice(5);
+        const clickHandler = isFuture ? '' : `onclick="selectTimelineCard('${dStr}')"`;
+
+        return `
+          <div class="${cardClass}" ${clickHandler}>
+            <div class="card-date">${labelDate}</div>
+            <div class="card-name">${escapeHtml(entry.name)}</div>
+            <div class="card-loc">${escapeHtml(entry.location)}</div>
+          </div>`;
+      }).join('');
+    }
+
+    function renderComments(dStr) {
+      const list = document.getElementById("comments-list");
+      const dayComments = globalComments.filter(c => cleanGoogleDateString(c.date) === dStr);
+
+      if (dayComments.length === 0) {
+        list.innerHTML = `<div style="font-size:0.8rem; color:var(--text-muted); font-family:monospace;">No transmissions logged for this date.</div>`;
+        return;
+      }
+
+      list.innerHTML = dayComments.map(c => `
+        <div class="comment-card">
+          <div class="comment-author">${escapeHtml(c.name || 'Anonymous')}</div>
+          <div class="comment-body">${escapeHtml(c.comment || '')}</div>
+        </div>
+      `).join('');
+      
+      list.scrollTop = list.scrollHeight;
+    }
+
+    function selectTimelineCard(dStr) {
+      if (dStr > todayStr) return;
+      const selected = globalSchedule.find(r => r.date === dStr) || { date: dStr, name: "UNANNOUNCED", location: "SYSTEM", link: "", writeup: "Slot unassigned." };
+      renderActivePlayer(selected);
+      renderTimelineGrid(dStr);
+      renderComments(dStr);
+    }
+
+    async function submitLike() {
+      globalLikes[activeDateStr] = (globalLikes[activeDateStr] || 0) + 1;
+      document.getElementById("like-count").textContent = globalLikes[activeDateStr];
+
+      await fetch(GOOGLE_APP_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "addLike", date: activeDateStr })
+      });
+    }
+
+    async function handleCommentSubmit(e) {
+      e.preventDefault();
+      const nameInput = document.getElementById("comment-name");
+      const textInput = document.getElementById("comment-text");
+
+      const nameVal = nameInput ? nameInput.value.trim() : "";
+      const commentVal = textInput ? textInput.value.trim() : "";
+
+      if (!commentVal) return;
+
+      const newComment = { 
+        action: "addComment",
+        date: activeDateStr, 
+        name: nameVal || "Anonymous", 
+        comment: commentVal 
+      };
+
+      try {
+        const response = await fetch(GOOGLE_APP_SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify(newComment)
+        });
+
+        const result = await response.json();
+
+        if (result.status === "success") {
+          gtag('event', 'comment_submitted', {
+            'event_category': 'Engagement',
+            'event_label': 'Successful Comment'
+          });
+
+          globalComments.push({ 
+            date: activeDateStr, 
+            name: newComment.name, 
+            comment: newComment.comment 
+          });
+          renderComments(activeDateStr);
+          textInput.value = "";
+        } else {
+          gtag('event', 'comment_rejected', {
+            'event_category': 'Moderation',
+            'event_label': result.message || 'Flagged by filter'
+          });
+
+          alert("Your comment was flagged by the moderation filter.");
+        }
+      } catch (err) {
+        console.error("Submission error:", err);
+        alert("Failed to submit comment. Please try again.");
+      }
+    }
+
+    async function handleFormSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById("submit-btn");
+      
+      const payload = {
+        name: document.getElementById("name").value.trim(),
+        location: document.getElementById("location").value.trim(),
+        link: document.getElementById("link").value.trim(),
+        vibe: document.getElementById("vibe").value.trim()
+      };
+
+      btn.textContent = "TRANSMITTING...";
+      btn.disabled = true;
+
+      try {
+        const response = await fetch(GOOGLE_APP_SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (result.status === "success") {
+          btn.textContent = "BURNED TO BUFFER!";
+          btn.style.background = "var(--accent-cyan)";
+          btn.style.color = "#000";
+
+          setTimeout(() => {
+            document.getElementById("submission-form").reset();
+            btn.textContent = "Burn Music";
+            btn.style.background = "linear-gradient(45deg, var(--accent-purple), #7b2cbf)";
+            btn.style.color = "#fff";
+            btn.disabled = false;
+          }, 2500);
+        } else {
+          throw new Error(result.message || "Submission rejected");
+        }
+      } catch (err) {
+        console.error("Submission error:", err);
+        alert("Error: " + err.message);
+        btn.textContent = "TRANSMISSION FAILED";
+        btn.disabled = false;
+      }
+    }
+
+    function escapeHtml(str) {
+      return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+
+    window.addEventListener('DOMContentLoaded', initializeSystem);
+  </script>
+</body>
+</html>
