@@ -154,6 +154,10 @@
           <input type="text" id="name" name="name" required placeholder="e.g., retro_driver99">
         </div>
         <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required placeholder="e.g., name@example.com">
+        </div>
+        <div class="form-group">
           <label for="location">Your Location</label>
           <input type="text" id="location" name="location" required placeholder="e.g., Tokyo, Japan">
         </div>
@@ -387,6 +391,7 @@
       
       const payload = {
         name: document.getElementById("name").value.trim(),
+        email: document.getElementById("email").value.trim(),
         location: document.getElementById("location").value.trim(),
         link: document.getElementById("link").value.trim(),
         vibe: document.getElementById("vibe").value.trim()
